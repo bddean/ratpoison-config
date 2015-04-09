@@ -1,0 +1,540 @@
+#+OPTIONS: ^:nil
+* [0/7] to-do list
+Roughly in order of priority
+  - [ ] toggle status bar
+  - [ ] don't use an external (outside this org-babel file) program
+    for switching windows
+  - [ ] switch to Python3 or make everything compatible with both
+    versions
+  - [ ] rework status bar
+    - python script iinstead of using conky
+  - [ ] notifications
+  - [ ] move things defined under "utilities" to shell variables or
+    something
+  - [ ] Emacs ratpoison mnode
+  - [ ] init rpws in .ratpoisonrc
+  - [ ] emacsclient -c -a (creates new frame) + helm as menu replacement?
+
+* Intro
+This is my configuration for the [[http://www.nongnu.org/ratpoison/][ratpoison window manager]].
+
+This file is an experiment with literate programming in
+[[http://orgmode.org/worg/org-contrib/babel/][org-bable]]. Using org-babel for this makes sense, since features are
+distributed across scripts, often small ones, written in different
+lanuages.
+
+*Requirements*
+  - ratpoison
+  - Python2 and Python3
+  - fortune
+  - strfile
+  - dzen2
+  - surfraw
+  - dmenu
+  - nmcli_dmenu
+  - xbacklight
+
+* Initialization and setup
+** Run it
+To install or update this configuration, run =org-babel-tangle= to
+export all the scripts and configuration files to the right
+place. Afterwards, the following python script should run.[fn:1] It does two
+things:
+  - Clear all current keybindings, so that we won't be stuck with old
+    bindings after getting rid of them.
+  - Load the ratpoison rc file
+
+After this script runs the first time, the configuration should load
+every time ratpoison starts
+#+NAME: _post-tangle
+#+BEGIN_SRC python :noweb tangle :results none
+  import subprocess
+
+  rp_cmd = ["ratpoison", "-c", "help"]
+  rp = subprocess.Popen(rp_cmd, stdout = subprocess.PIPE)
+  bindings = rp.stdout.read().decode().split("\n")
+
+  for b in bindings:
+      if len(b) == 0: continue
+      binding = b.split(" ", 1)[0]
+      subprocess.call(["ratpoison", "-c", "unbind " + binding])
+
+  subprocess.call(["ratpoison", "-c", "source /home/ben/.ratpoisonrc"])
+#+END_SRC
+
+[fn:1] Requires the following elisp snippet or equivalent in your
+init.el. =org-babel-post-tangle-hook= runs in a temporary buffer for
+every file that gets tangled to, so use an advice for the post-tangle
+case.
+
+#+BEGIN_SRC elisp :exports results
+  (find-function 'my-org-babel-pre-tangle)
+  (buffer-substring (point)
+                    (search-forward "(ad-activate 'org-babel-tangle)"))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+(defun my-org-babel-pre-tangle ()
+  (when (member "_pre-tangle" (org-babel-src-block-names))
+    (save-excursion
+      (org-babel-goto-named-src-block "_pre-tangle")
+      (org-babel-execute-src-block))))
+
+(defun my-org-babel-post-tangle ()
+  (when (member "_post-tangle" (org-babel-src-block-names))
+    (save-excursion
+      (org-babel-goto-named-src-block "_post-tangle")
+      (org-babel-execute-src-block))))
+
+(add-hook 'org-babel-pre-tangle-hook  'my-org-babel-pre-tangle)
+
+;; org-babel-post-tangle-hook is run in every tangled buffer, so we
+;; need to use an advice
+(defadvice org-babel-tangle (after specialblock)
+  "Run a named src block to post-process / execute a named src
+block"
+  (print (current-buffer))
+  (my-org-babel-post-tangle))
+(ad-activate 'org-babel-tangle)
+#+end_example
+
+** Welcome message
+By default, ratpoison says something like "welcome to ratpoison."
+Disable this.
+#+BEGIN_SRC ratpoison :tangle ~/.ratpoisonrc
+startup_message off
+#+END_SRC
+
+Instead, I want to show a haiku on startup. I use =fortune= with a
+custom cookies file. I want the haiku to last longer than most
+messages so that I can read it. =msgwait= sets the number of seconds
+that messages echoed by ratpoison stay visible.
+
+call this script from .ratpoisonrc, after we've [[file:ratpoison.org::Set the appearance][setting the formatting]] for
+messages.
+
+#+BEGIN_SRC sh :noweb tangle :tangle tangle/haiku.sh 
+ratpoison -c "msgwait 10"
+FOR="$(fortune <<get-data-directory()>>/haikus)"
+ratpoison -c "echo $FOR"
+ratpoison -c "msgwait 3"
+#+END_SRC
+
+I generate the haikus with the following python script. It downloads
+the archives of http://www.dailyhaiku.org/. There are a few thousand
+as of <2015-01-15 Thu>. It takes some time to complete.
+
+#+BEGIN_SRC python :noweb yes
+from bs4 import BeautifulSoup
+import requests
+import codecs
+
+page = 0
+with codecs.open("<<get-data-directory()>>haikus", "w", "utf-8") as f:
+    while True:
+        page += 1
+        r = requests.get("http://www.dailyhaiku.org/haiku/?pg=" + str(page))
+        data = r.text
+        soup = BeautifulSoup(data)
+    
+        haikus = map(lambda x : "\n".join([line.strip() for line in x.text.split("\n")]), 
+                     soup.select(".haiku"))
+        if len(haikus) == 0: # no more haikus :(
+            break
+    
+        for h in haikus:
+            f.write(h + "\n%\n") # %-delimited
+#+END_SRC
+
+That will give you a text file of "%" delimited haikus. Run =strfile
+haikus= to turn them into fortune cookies.
+
+** Utilities
+Things that multiple scripts need to know:
+*** Scripts directory
+#+NAME: get-scripts-directory
+#+BEGIN_SRC elisp :noweb tangle
+  (concat (file-name-directory buffer-file-name) "tangle/")
+#+END_SRC
+
+*** Data directory
+#+NAME: get-data-directory
+#+BEGIN_SRC elisp :noweb tangle
+  (file-name-directory buffer-file-name)
+#+END_SRC
+* Appearance
+Set the appearance of ratpoison messages. Afterwards, display a [[file:ratpoison.org::after we've set the formatting][haiku]].
+
+#+BEGIN_SRC ratpoison :noweb tangle :tangle ~/.ratpoisonrc
+set font "Mono-12"
+set bgcolor gray20
+set fgcolor wheat
+set font -b&h-lucidatypewriter-bold-r-normal-sans-18-180-75-75-m-110-iso8859-1;
+set inputwidth 1200
+set bargravity ne
+set barpadding 4 4
+set border 1
+
+exec <<get-scripts-directory()>>/haiku.sh
+#+END_SRC
+
+* Status bar
+Use conky and dzen2 to show useful information at the top of the screen.
+
+This part is very messy, for a couple of reasons:
+  - conky is not a very good language for formatting text etc
+  - I'm using an ad-hoc combiniation of absolute and relative
+    positioning that probably won't work on other computer screens
+
+If I get around to reworking it, I may just write a Python script
+from scratch instead of using conky
+
+Allocate some space at the top of the screen and startup conky:
+#+BEGIN_SRC ratpoison :tangle ~/.ratpoisonrc :noweb tangle
+set padding 0 16 0 0
+addhook quit exec killall dzen2
+addhook quit exec killall conky
+killall conky
+exec conky | dzen2 -ta l -e 'sigusr1=hide;sigusr2=unhide' -h '16' &
+#+END_SRC
+
+
+** ~/.conkyrc
+*** Settings 
+Configure appearance and other settings
+#+BEGIN_SRC conkyrc :tangle ~/.conkyrc :padline no
+out_to_x no
+out_to_console yes
+background no
+cpu_avg_samples 2
+net_avg_samples 2
+no_buffers yes
+out_to_console yes
+out_to_stderr no
+extra_newline no
+update_interval 0.25
+update_interval_on_battery 3 # saves battery life
+uppercase no
+use_spacer none
+#+END_SRC
+
+**** noweb constants
+Navy blue
+#+NAME: dzen-bg-1
+#+BEGIN_SRC conkyrc
+\#080835
+#+END_SRC
+
+Dark red
+#+NAME: dzen-bg-2
+#+BEGIN_SRC conkyrc
+\#350808
+#+END_SRC
+*** Text
+The TEXT section of .conkyrc defines the format of the status
+bar. Display pieces of information preceded by these one-character
+codes:
+  - B :: battery percent and time remaining
+  - V :: volume
+  - C :: CPU usage
+  - R :: RAM usage
+  - U :: upload speed
+  - D :: download speed
+  - Q :: network quality
+
+At the left, display the title of the current window, as well as the
+previous and next ones. This way we know when we're going when moving
+between windows, but without the clutter that would come with showing
+every window. We can use =ratpoison -c windows= and =grep= to get the
+current window, but we need a script to get the previous and next
+ones:
+#+BEGIN_SRC python :tangle tangle/nextwindow.py :results output :exports code :cmdline -p :results none
+  import subprocess
+  import sys
+
+  forward = -1 if (len(sys.argv) > 1 and sys.argv[1] == "-p") else 1
+  windows = subprocess.Popen(["ratpoison", "-c", "windows %f%s%t"],
+                             stdout=subprocess.PIPE).stdout.read().split("\n")[:-1]
+  windows = [w for i, w in enumerate(windows)
+             if not w[0].isdigit() or w[1] == "*"]
+  current_idx = next(i for i,w in enumerate(windows) if
+                     w[1] == "*")
+  print windows[(current_idx + forward + len(windows)) % len(windows)][2:]
+#+END_SRC
+
+#+BEGIN_SRC conkyrc :tangle ~/.conkyrc :padline no :noweb tangle
+TEXT
+${exec python2 <<get-scripts-directory()>>nextwindow.py -p}\
+                                                                        \
+^pa(203)^bg(black)\
+^fg(red)|\
+^fg(yellow)${exec ratpoison -c "windows %s%t" | grep -G "^*" | cut -c 2-}\
+                                                                        \
+^fg(red)|\
+^pa(496)\
+^fg(red)|\
+^bg()^fg()${exec python2 <<get-scripts-directory()>>nextwindow.py}\
+                                                                        \
+#+END_SRC
+
+**** Battery
+The battery percentage and time remaining are color-coded as following:
+  - red :: unplugged and less than 15% remaining
+  - orange :: unplugged and less than 75% remaining
+  - green :: unplugged and mostly charged
+  - gray :: plugged in
+
+I have to use negative offsets in places, so that all the spaces in
+the if-statements don't push elements apart. This is very messy. A
+solution would be to make all positioning explicit using =^ps()=,
+tangle these into a script that kills whitespace, and tangle the
+output of that script into .conkyrc.
+
+#+BEGIN_SRC conkyrc :tangle ~/.conkyrc :padline no :noweb tangle
+^bg(<<dzen-bg-1>>)\
+^pa(700)^fg(white)|\
+^fg(\#00ffff)B\
+${if_existing /sys/class/power_supply/ADP0/online 0}\
+  ${if_match ${battery_percent BAT0} <= 15}\
+    ^fg(red)\
+  ${endif}\
+  ${if_match ${battery_percent BAT0} <= 75}\
+    ^fg(orange)\
+  $else\
+    ^fg(green)\
+  ${endif}\
+  ^p(-55)\
+$else\
+  ^fg(grey)\
+  ^p(-15)\
+${endif}\
+${battery_percent BAT0}%, \
+${if_empty ${battery_time BAT0}}charged  \
+$else\
+${battery_time BAT0} \
+${endif}\
+#+END_SRC
+
+**** Volume
+Show the volume. 
+#+BEGIN_SRC conkyrc :tangle ~/.conkyrc :padline no :noweb tangle
+^fg(white)|\
+^bg(<<dzen-bg-2>>)^fg(\#00ffff)V\
+${if_empty ${exec amixer -c 0 -M get Master | grep '\[on\]'}}\
+  ^fg(grey)\
+$else\
+  ^fg(green)\
+${endif}\
+^p(-8)${exec amixer -c 0 -M get Master | grep -oE "[[:digit:]]*%"} \
+#+END_SRC
+
+**** System and network info
+CPU, RAM, upload and download speed and network quality
+
+#+BEGIN_SRC conkyrc :tangle ~/.conkyrc :padline no :noweb tangle
+^fg(white)|\
+^bg(<<dzen-bg-1>>)^fg(\#00ffff)C^fg(grey)$cpu%^fg(\#00ffff) R^fg(grey)$memperc% \
+^fg(white)|\
+^bg(<<dzen-bg-2>>)^fg(\#00ffff)U^fg(grey)${upspeedf wlan0} \
+^fg(\#00ffff)D ^fg(grey)${downspeedf wlan0} \
+^fg(\#00ffff)Q ^fg(grey)${wireless_link_qual_perc wlan0}%\
+#+END_SRC
+
+**** Time
+Right now this is just a simple time display.
+#+BEGIN_SRC conkyrc :tangle ~/.conkyrc :padline no
+^pa(1175)^fg(white)|\
+^bg()^fg(yellow)${time %a.%d.%m.%Y %R}
+#+END_SRC
+
+* applications
+Use surfraw to look things up conveniently
+#+BEGIN_SRC ratpoison :tangle ~/.ratpoisonrc
+bind h exec surfraw google    $(echo "" | dmenu)
+bind H exec surfraw wikipedia $(echo "" | dmenu)
+#+END_SRC
+
+Use dmenu to run anything, and bind keys in the lower left-hand corner
+of the keyboard to open applications I use frequently
+#+BEGIN_SRC ratpoison :tangle ~/.ratpoisonrc
+bind exclam exec
+bind at exec perl /home/ben/Dropbox/config/dmenu_run_weighted.pl
+bind m exec rxvt-unicode
+bind M exec gksudo synaptic
+bind comma exec firefox
+bind less exec uzbl-browser
+bind period exec emacsclient -c -a ""
+bind greater exec anki
+bind slash exec teeworlds
+bind question exec x-terminal-emulator -e nethack
+#+END_SRC
+
+Dmenu interface for network manager
+#+BEGIN_SRC ratpoison :tangle ~/.ratpoisonrc :noweb tangle
+bind v exec /home/ben/Dropbox/config/nmcli-dmenu/nmcli_dmenu
+#+END_SRC
+* Function keys
+** Volume
+#+BEGIN_SRC ratpoison :tangle ~/.ratpoisonrc
+# force conky to reread init file so it updates
+definekey top XF86AudioLowerVolume exec amixer -D pulse set Master 5%- && killall -SIGUSR1 conky
+definekey top XF86AudioRaiseVolume exec amixer -D pulse set Master 5%+ && killall -SIGUSR1 conky
+definekey top XF86AudioMute exec amixer -D pulse set Master toggle && killall -SIGUSR1 conky
+#+END_SRC
+** Brightness
+I can't get XF86 brightness keys to work on my keyboard. But the
+bracket is in a more comfortable location anyway
+#+BEGIN_SRC ratpoison :tangle ~/.ratpoisonrc
+bind bracketright exec xbacklight -inc 10
+bind bracketleft  exec xbacklight -dec 10
+bind braceright exec xbacklight -set 100
+bind braceleft  exec xbacklight -set 0
+#+END_SRC
+
+* Workspaces
+rpws makes workspaces work. I haven't found myself using it much, though
+
+Make sure this is in ~/.xinitrc:
+#+BEGIN_SRC 
+exec /usr/bin/rpws init 12 -k
+#+END_SRC
+
+Use the function keys to switch workspaces:
+#+BEGIN_SRC ratpoison :tangle ~/.ratpoisonrc
+bind F1  exec rpws 1
+bind F2  exec rpws 2
+bind F3  exec rpws 3
+bind F4  exec rpws 4
+bind F5  exec rpws 5
+bind F6  exec rpws 6
+bind F7  exec rpws 7
+bind F8  exec rpws 8
+bind F9  exec rpws 9
+bind F10 exec rpws 10
+bind F11 exec rpws 11
+bind F12 exec rpws 12
+#+END_SRC
+
+* Frames and windows
+** Frames
+#+BEGIN_SRC ratpoison :tangle ~/.ratpoisonrc
+bind f fselect
+bind C-f fselect
+set framesels asdfjkl;qweruiopzxcvnm,./ghbty
+
+bind W split
+bind S exec ratpoison -c split; ratpoison -c focusdown;
+bind A hsplit
+bind D exec ratpoison -c hsplit; ratpoison -c focusright;
+
+bind Tab focus
+bind C-Tab focuslast
+bind C-A exchangeleft
+bind C-D exchangeright
+bind C-W exchangeup
+bind C-S exchangedown
+bind a focusleft
+bind d focusright
+bind w focusup
+bind s focusdown
+bind q only
+bind e remove
+bind C-a removeleft
+bind C-d removeright
+bind C-w removeup
+bind C-s removedown
+
+bind F curframe
+bind r resize
+bind R resize
+#+END_SRC
+
+#+RESULTS:
+: 0
+
+** Windows
+To switch between windows, I use a script adapted from [[https://github.com/dimatura/dratmenu/blob/master/dratmenu.py][dratmenu]] I
+named rpdmenu. I just added an option to limit the window list to the
+application you're in when you run it. That plus iprev and inext makes
+it much easier to manage, e.g., a browser with many windows open.
+
+#+BEGIN_SRC ratpoison :tangle ~/.ratpoisonrc :results none
+bind            grave exec sudo pm-suspend
+bind asciitilde exec sudo pm-hibernate
+
+bind apostrophe exec python2 /home/ben/Dropbox/config/rpdmenu.py
+bind C-apostrophe exec python2 /home/ben/Dropbox/config/rpdmenu.py --same-app
+bind x prev
+bind X iprev
+bind c next
+bind C inext
+bind C-n next
+bind C-p prev
+bind space next
+bind C-space next
+
+bind C-x nextscreen
+bind C-c prevscreen
+
+bind z title
+bind minus select -
+bind k delete
+bind C-k delete
+bind K kill
+bind C-K kill
+
+bind t swap
+bind T swap
+#+END_SRC
+
+* More keybindings
+#+BEGIN_SRC ratpoison :tangle ~/.ratpoisonrc :noweb yes
+escape Alt_R
+bind b banish
+
+bind semicolon colon
+bind l redisplay
+bind C-l redisplay
+bind n lastmsg
+
+bind C-V license
+
+bind u undo
+bind U undo
+bind y redo
+bind Y redo
+## M-_ for every command so i don't need two keystrokes
+exec python3 <<get-scripts-directory()>>/metabindings.py
+#+END_SRC
+
+
+Since L_Alt is the escape key, create an additional binding with the
+alt key for every command so we don't have to let go of R_Alt before
+pressing a key.
+
+This does mean that, for instance, =x= and =M-x= couldn't be bound to
+different commands.
+#+BEGIN_SRC python :tangle tangle/metabindings.py
+import subprocess
+
+rp_cmd = ["ratpoison", "-c", "help" ]
+rp = subprocess.Popen(rp_cmd, stdout = subprocess.PIPE)
+old_bindings = rp.stdout.read().decode().split("\n")
+
+additional_bindings = []
+for b in old_bindings:
+    if len(b) == 0: continue
+    binding, command = b.split(" ", 1)
+    if binding.startswith("M-") or binding.startswith("C-M-"): continue
+    newbinding = "M-" + binding if not binding.startswith("C-") else "C-M-" + binding[2:]
+    additional_bindings.append(newbinding + " " + command)
+
+for b in additional_bindings:
+    subprocess.call(["ratpoison", "-c", "bind " + b])
+#+END_SRC
+
+#+RESULTS:
+: None
+
+
