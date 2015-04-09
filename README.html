@@ -1,0 +1,993 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>ratpoison</title>
+<!-- 2015-04-09 Thu 15:14 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="Ben Dean" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">ratpoison</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. <code>[0/7]</code> to-do list</a></li>
+<li><a href="#sec-2">2. Intro</a></li>
+<li><a href="#sec-3">3. Initialization and setup</a>
+<ul>
+<li><a href="#sec-3-1">3.1. Run it</a></li>
+<li><a href="#sec-3-2">3.2. Welcome message</a></li>
+<li><a href="#sec-3-3">3.3. Utilities</a>
+<ul>
+<li><a href="#sec-3-3-1">3.3.1. Scripts directory</a></li>
+<li><a href="#sec-3-3-2">3.3.2. Data directory</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-4">4. Appearance</a></li>
+<li><a href="#sec-5">5. Status bar</a>
+<ul>
+<li><a href="#sec-5-1">5.1. ~/.conkyrc</a>
+<ul>
+<li><a href="#sec-5-1-1">5.1.1. Settings</a></li>
+<li><a href="#sec-5-1-2">5.1.2. Text</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-6">6. applications</a></li>
+<li><a href="#sec-7">7. Function keys</a>
+<ul>
+<li><a href="#sec-7-1">7.1. Volume</a></li>
+<li><a href="#sec-7-2">7.2. Brightness</a></li>
+</ul>
+</li>
+<li><a href="#sec-8">8. Workspaces</a></li>
+<li><a href="#sec-9">9. Frames and windows</a>
+<ul>
+<li><a href="#sec-9-1">9.1. Frames</a></li>
+<li><a href="#sec-9-2">9.2. Windows</a></li>
+</ul>
+</li>
+<li><a href="#sec-10">10. More keybindings</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> <code>[0/7]</code> to-do list</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Roughly in order of priority
+</p>
+<ul class="org-ul">
+<li><code>[&#xa0;]</code> toggle status bar
+</li>
+<li><code>[&#xa0;]</code> don't use an external (outside this org-babel file) program
+for switching windows
+</li>
+<li><code>[&#xa0;]</code> switch to Python3 or make everything compatible with both
+versions
+</li>
+<li><code>[&#xa0;]</code> rework status bar
+<ul class="org-ul">
+<li>python script iinstead of using conky
+</li>
+</ul>
+</li>
+<li><code>[&#xa0;]</code> notifications
+</li>
+<li><code>[&#xa0;]</code> move things defined under "utilities" to shell variables or
+something
+</li>
+<li><code>[&#xa0;]</code> Emacs ratpoison mnode
+</li>
+<li><code>[&#xa0;]</code> init rpws in .ratpoisonrc
+</li>
+<li><code>[&#xa0;]</code> emacsclient -c -a (creates new frame) + helm as menu replacement?
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Intro</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+This is my configuration for the <a href="http://www.nongnu.org/ratpoison/">ratpoison window manager</a>.
+</p>
+
+<p>
+This file is an experiment with literate programming in
+<a href="http://orgmode.org/worg/org-contrib/babel/">org-bable</a>. Using org-babel for this makes sense, since features are
+distributed across scripts, often small ones, written in different
+lanuages.
+</p>
+
+<p>
+<b>Requirements</b>
+</p>
+<ul class="org-ul">
+<li>ratpoison
+</li>
+<li>Python2 and Python3
+</li>
+<li>fortune
+</li>
+<li>strfile
+</li>
+<li>dzen2
+</li>
+<li>surfraw
+</li>
+<li>dmenu
+</li>
+<li>nmcli_dmenu
+</li>
+<li>xbacklight
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Initialization and setup</h2>
+<div class="outline-text-2" id="text-3">
+</div><div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> Run it</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+To install or update this configuration, run <code>org-babel-tangle</code> to
+export all the scripts and configuration files to the right
+place. Afterwards, the following python script should run.<sup><a id="fnr.1" name="fnr.1" class="footref" href="#fn.1">1</a></sup> It does two
+things:
+</p>
+<ul class="org-ul">
+<li>Clear all current keybindings, so that we won't be stuck with old
+bindings after getting rid of them.
+</li>
+<li>Load the ratpoison rc file
+</li>
+</ul>
+
+<p>
+After this script runs the first time, the configuration should load
+every time ratpoison starts
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python" id="_post-tangle"><span style="color: #859900; font-weight: bold;">import</span> subprocess
+
+<span style="color: #268bd2;">rp_cmd</span> = [<span style="color: #2aa198;">"ratpoison"</span>, <span style="color: #2aa198;">"-c"</span>, <span style="color: #2aa198;">"help"</span>]
+<span style="color: #268bd2;">rp</span> = subprocess.Popen(rp_cmd, stdout = subprocess.PIPE)
+<span style="color: #268bd2;">bindings</span> = rp.stdout.read().decode().split(<span style="color: #2aa198;">"\n"</span>)
+
+<span style="color: #859900; font-weight: bold;">for</span> b <span style="color: #859900; font-weight: bold;">in</span> bindings:
+    <span style="color: #859900; font-weight: bold;">if</span> <span style="color: #839496; font-weight: bold;">len</span>(b) == 0: <span style="color: #859900; font-weight: bold;">continue</span>
+    <span style="color: #268bd2;">binding</span> = b.split(<span style="color: #2aa198;">" "</span>, 1)[0]
+    subprocess.call([<span style="color: #2aa198;">"ratpoison"</span>, <span style="color: #2aa198;">"-c"</span>, <span style="color: #2aa198;">"unbind "</span> + binding])
+
+subprocess.call([<span style="color: #2aa198;">"ratpoison"</span>, <span style="color: #2aa198;">"-c"</span>, <span style="color: #2aa198;">"source /home/ben/.ratpoisonrc"</span>])
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> Welcome message</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+By default, ratpoison says something like "welcome to ratpoison."
+Disable this.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-ratpoison">startup_message off
+</pre>
+</div>
+
+<p>
+Instead, I want to show a haiku on startup. I use <code>fortune</code> with a
+custom cookies file. I want the haiku to last longer than most
+messages so that I can read it. <code>msgwait</code> sets the number of seconds
+that messages echoed by ratpoison stay visible.
+</p>
+
+<p>
+call this script from .ratpoisonrc, after we've <a href="ratpoison.html">setting the formatting</a> for
+messages.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">ratpoison -c <span style="color: #2aa198;">"msgwait 10"</span>
+<span style="color: #268bd2;">FOR</span>=<span style="color: #2aa198;">"$(</span><span style="color: #6c71c4; font-weight: bold;">fortune</span><span style="color: #2aa198;"> &lt;&lt;get-data-directory()&gt;&gt;/haikus)"</span>
+ratpoison -c <span style="color: #2aa198;">"echo $FOR"</span>
+ratpoison -c <span style="color: #2aa198;">"msgwait 3"</span>
+</pre>
+</div>
+
+<p>
+I generate the haikus with the following python script. It downloads
+the archives of <a href="http://www.dailyhaiku.org/">http://www.dailyhaiku.org/</a>. There are a few thousand
+as of <span class="timestamp-wrapper"><span class="timestamp">&lt;2015-01-15 Thu&gt;</span></span>. It takes some time to complete.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #859900; font-weight: bold;">from</span> bs4 <span style="color: #859900; font-weight: bold;">import</span> BeautifulSoup
+<span style="color: #859900; font-weight: bold;">import</span> requests
+<span style="color: #859900; font-weight: bold;">import</span> codecs
+
+<span style="color: #268bd2;">page</span> = 0
+<span style="color: #859900; font-weight: bold;">with</span> codecs.<span style="color: #839496; font-weight: bold;">open</span>(<span style="color: #2aa198;">"/home/ben/Dropbox/config/ratpoison/haikus"</span>, <span style="color: #2aa198;">"w"</span>, <span style="color: #2aa198;">"utf-8"</span>) <span style="color: #859900; font-weight: bold;">as</span> f:
+    <span style="color: #859900; font-weight: bold;">while</span> <span style="color: #268bd2; font-weight: bold;">True</span>:
+        <span style="color: #268bd2;">page</span> += 1
+        <span style="color: #268bd2;">r</span> = requests.get(<span style="color: #2aa198;">"http://www.dailyhaiku.org/haiku/?pg="</span> + <span style="color: #839496; font-weight: bold;">str</span>(page))
+        <span style="color: #268bd2;">data</span> = r.text
+        <span style="color: #268bd2;">soup</span> = BeautifulSoup(data)
+
+        <span style="color: #268bd2;">haikus</span> = <span style="color: #839496; font-weight: bold;">map</span>(<span style="color: #859900; font-weight: bold;">lambda</span> x : <span style="color: #2aa198;">"\n"</span>.join([line.strip() <span style="color: #859900; font-weight: bold;">for</span> line <span style="color: #859900; font-weight: bold;">in</span> x.text.split(<span style="color: #2aa198;">"\n"</span>)]), 
+                     soup.select(<span style="color: #2aa198;">".haiku"</span>))
+        <span style="color: #859900; font-weight: bold;">if</span> <span style="color: #839496; font-weight: bold;">len</span>(haikus) == 0: <span style="color: #586e75;"># </span><span style="color: #586e75;">no more haikus :(</span>
+            <span style="color: #859900; font-weight: bold;">break</span>
+
+        <span style="color: #859900; font-weight: bold;">for</span> h <span style="color: #859900; font-weight: bold;">in</span> haikus:
+            f.write(h + <span style="color: #2aa198;">"\n%\n"</span>) <span style="color: #586e75;"># </span><span style="color: #586e75;">%-delimited</span>
+</pre>
+</div>
+
+<p>
+That will give you a text file of "%" delimited haikus. Run <code>strfile
+haikus</code> to turn them into fortune cookies.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3-3" class="outline-3">
+<h3 id="sec-3-3"><span class="section-number-3">3.3</span> Utilities</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+Things that multiple scripts need to know:
+</p>
+</div>
+<div id="outline-container-sec-3-3-1" class="outline-4">
+<h4 id="sec-3-3-1"><span class="section-number-4">3.3.1</span> Scripts directory</h4>
+<div class="outline-text-4" id="text-3-3-1">
+<div class="org-src-container">
+
+<pre class="src src-elisp" id="get-scripts-directory">(concat (file-name-directory buffer-file-name) <span style="color: #2aa198;">"tangle/"</span>)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-3-2" class="outline-4">
+<h4 id="sec-3-3-2"><span class="section-number-4">3.3.2</span> Data directory</h4>
+<div class="outline-text-4" id="text-3-3-2">
+<div class="org-src-container">
+
+<pre class="src src-elisp" id="get-data-directory">(file-name-directory buffer-file-name)
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> Appearance</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+Set the appearance of ratpoison messages. Afterwards, display a <a href="ratpoison.html">haiku</a>.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ratpoison">set font "Mono-12"
+set bgcolor gray20
+set fgcolor wheat
+set font -b&amp;h-lucidatypewriter-bold-r-normal-sans-18-180-75-75-m-110-iso8859-1;
+set inputwidth 1200
+set bargravity ne
+set barpadding 4 4
+set border 1
+
+exec &lt;&lt;get-scripts-directory()&gt;&gt;/haiku.sh
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> Status bar</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+Use conky and dzen2 to show useful information at the top of the screen.
+</p>
+
+<p>
+This part is very messy, for a couple of reasons:
+</p>
+<ul class="org-ul">
+<li>conky is not a very good language for formatting text etc
+</li>
+<li>I'm using an ad-hoc combiniation of absolute and relative
+positioning that probably won't work on other computer screens
+</li>
+</ul>
+
+<p>
+If I get around to reworking it, I may just write a Python script
+from scratch instead of using conky
+</p>
+
+<p>
+Allocate some space at the top of the screen and startup conky:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-ratpoison">set padding 0 16 0 0
+addhook quit exec killall dzen2
+addhook quit exec killall conky
+killall conky
+exec conky | dzen2 -ta l -e 'sigusr1=hide;sigusr2=unhide' -h '16' &amp;
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-5-1" class="outline-3">
+<h3 id="sec-5-1"><span class="section-number-3">5.1</span> ~/.conkyrc</h3>
+<div class="outline-text-3" id="text-5-1">
+</div><div id="outline-container-sec-5-1-1" class="outline-4">
+<h4 id="sec-5-1-1"><span class="section-number-4">5.1.1</span> Settings</h4>
+<div class="outline-text-4" id="text-5-1-1">
+<p>
+Configure appearance and other settings
+</p>
+<div class="org-src-container">
+
+<pre class="src src-conkyrc">out_to_x no
+out_to_console yes
+background no
+cpu_avg_samples 2
+net_avg_samples 2
+no_buffers yes
+out_to_console yes
+out_to_stderr no
+extra_newline no
+update_interval 0.25
+update_interval_on_battery 3 # saves battery life
+uppercase no
+use_spacer none
+</pre>
+</div>
+</div>
+
+<ol class="org-ol"><li><a id="sec-5-1-1-1" name="sec-5-1-1-1"></a>noweb constants<br  /><div class="outline-text-5" id="text-5-1-1-1">
+<p>
+Navy blue
+</p>
+<div class="org-src-container">
+
+<pre class="src src-conkyrc" id="dzen-bg-1">\#080835
+</pre>
+</div>
+
+<p>
+Dark red
+</p>
+<div class="org-src-container">
+
+<pre class="src src-conkyrc" id="dzen-bg-2">\#350808
+</pre>
+</div>
+</div>
+</li></ol>
+</div>
+<div id="outline-container-sec-5-1-2" class="outline-4">
+<h4 id="sec-5-1-2"><span class="section-number-4">5.1.2</span> Text</h4>
+<div class="outline-text-4" id="text-5-1-2">
+<p>
+The TEXT section of .conkyrc defines the format of the status
+bar. Display pieces of information preceded by these one-character
+codes:
+</p>
+<dl class="org-dl">
+<dt> B </dt><dd>battery percent and time remaining
+</dd>
+<dt> V </dt><dd>volume
+</dd>
+<dt> C </dt><dd>CPU usage
+</dd>
+<dt> R </dt><dd>RAM usage
+</dd>
+<dt> U </dt><dd>upload speed
+</dd>
+<dt> D </dt><dd>download speed
+</dd>
+<dt> Q </dt><dd>network quality
+</dd>
+</dl>
+
+<p>
+At the left, display the title of the current window, as well as the
+previous and next ones. This way we know when we're going when moving
+between windows, but without the clutter that would come with showing
+every window. We can use <code>ratpoison -c windows</code> and <code>grep</code> to get the
+current window, but we need a script to get the previous and next
+ones:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #859900; font-weight: bold;">import</span> subprocess
+<span style="color: #859900; font-weight: bold;">import</span> sys
+
+<span style="color: #268bd2;">forward</span> = -1 <span style="color: #859900; font-weight: bold;">if</span> (<span style="color: #839496; font-weight: bold;">len</span>(sys.argv) &gt; 1 <span style="color: #859900; font-weight: bold;">and</span> sys.argv[1] == <span style="color: #2aa198;">"-p"</span>) <span style="color: #859900; font-weight: bold;">else</span> 1
+<span style="color: #268bd2;">windows</span> = subprocess.Popen([<span style="color: #2aa198;">"ratpoison"</span>, <span style="color: #2aa198;">"-c"</span>, <span style="color: #2aa198;">"windows %f%s%t"</span>],
+                           stdout=subprocess.PIPE).stdout.read().split(<span style="color: #2aa198;">"\n"</span>)[:-1]
+<span style="color: #268bd2;">windows</span> = [w <span style="color: #859900; font-weight: bold;">for</span> i, w <span style="color: #859900; font-weight: bold;">in</span> <span style="color: #839496; font-weight: bold;">enumerate</span>(windows)
+           <span style="color: #859900; font-weight: bold;">if</span> <span style="color: #859900; font-weight: bold;">not</span> w[0].isdigit() <span style="color: #859900; font-weight: bold;">or</span> w[1] == <span style="color: #2aa198;">"*"</span>]
+<span style="color: #268bd2;">current_idx</span> = <span style="color: #839496; font-weight: bold;">next</span>(i <span style="color: #859900; font-weight: bold;">for</span> i,w <span style="color: #859900; font-weight: bold;">in</span> <span style="color: #839496; font-weight: bold;">enumerate</span>(windows) <span style="color: #859900; font-weight: bold;">if</span>
+                   w[1] == <span style="color: #2aa198;">"*"</span>)
+<span style="color: #859900; font-weight: bold;">print</span> windows[(current_idx + forward + <span style="color: #839496; font-weight: bold;">len</span>(windows)) % <span style="color: #839496; font-weight: bold;">len</span>(windows)][2:]
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-conkyrc">TEXT
+${exec python2 &lt;&lt;get-scripts-directory()&gt;&gt;nextwindow.py -p}\
+                                                                        \
+^pa(203)^bg(black)\
+^fg(red)|\
+^fg(yellow)${exec ratpoison -c "windows %s%t" | grep -G "^*" | cut -c 2-}\
+                                                                        \
+^fg(red)|\
+^pa(496)\
+^fg(red)|\
+^bg()^fg()${exec python2 &lt;&lt;get-scripts-directory()&gt;&gt;nextwindow.py}\
+                                                                        \
+</pre>
+</div>
+</div>
+
+<ol class="org-ol"><li><a id="sec-5-1-2-1" name="sec-5-1-2-1"></a>Battery<br  /><div class="outline-text-5" id="text-5-1-2-1">
+<p>
+The battery percentage and time remaining are color-coded as following:
+</p>
+<dl class="org-dl">
+<dt> red </dt><dd>unplugged and less than 15% remaining
+</dd>
+<dt> orange </dt><dd>unplugged and less than 75% remaining
+</dd>
+<dt> green </dt><dd>unplugged and mostly charged
+</dd>
+<dt> gray </dt><dd>plugged in
+</dd>
+</dl>
+
+<p>
+I have to use negative offsets in places, so that all the spaces in
+the if-statements don't push elements apart. This is very messy. A
+solution would be to make all positioning explicit using <code>^ps()</code>,
+tangle these into a script that kills whitespace, and tangle the
+output of that script into .conkyrc.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-conkyrc">^bg(&lt;&lt;dzen-bg-1&gt;&gt;)\
+^pa(700)^fg(white)|\
+^fg(\#00ffff)B\
+${if_existing /sys/class/power_supply/ADP0/online 0}\
+  ${if_match ${battery_percent BAT0} &lt;= 15}\
+    ^fg(red)\
+  ${endif}\
+  ${if_match ${battery_percent BAT0} &lt;= 75}\
+    ^fg(orange)\
+  $else\
+    ^fg(green)\
+  ${endif}\
+  ^p(-55)\
+$else\
+  ^fg(grey)\
+  ^p(-15)\
+${endif}\
+${battery_percent BAT0}%, \
+${if_empty ${battery_time BAT0}}charged  \
+$else\
+${battery_time BAT0} \
+${endif}\
+</pre>
+</div>
+</div>
+</li>
+
+<li><a id="sec-5-1-2-2" name="sec-5-1-2-2"></a>Volume<br  /><div class="outline-text-5" id="text-5-1-2-2">
+<p>
+Show the volume. 
+</p>
+<div class="org-src-container">
+
+<pre class="src src-conkyrc">^fg(white)|\
+^bg(&lt;&lt;dzen-bg-2&gt;&gt;)^fg(\#00ffff)V\
+${if_empty ${exec amixer -c 0 -M get Master | grep '\[on\]'}}\
+  ^fg(grey)\
+$else\
+  ^fg(green)\
+${endif}\
+^p(-8)${exec amixer -c 0 -M get Master | grep -oE "[[:digit:]]*%"} \
+</pre>
+</div>
+</div>
+</li>
+
+<li><a id="sec-5-1-2-3" name="sec-5-1-2-3"></a>System and network info<br  /><div class="outline-text-5" id="text-5-1-2-3">
+<p>
+CPU, RAM, upload and download speed and network quality
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-conkyrc">^fg(white)|\
+^bg(&lt;&lt;dzen-bg-1&gt;&gt;)^fg(\#00ffff)C^fg(grey)$cpu%^fg(\#00ffff) R^fg(grey)$memperc% \
+^fg(white)|\
+^bg(&lt;&lt;dzen-bg-2&gt;&gt;)^fg(\#00ffff)U^fg(grey)${upspeedf wlan0} \
+^fg(\#00ffff)D ^fg(grey)${downspeedf wlan0} \
+^fg(\#00ffff)Q ^fg(grey)${wireless_link_qual_perc wlan0}%\
+</pre>
+</div>
+</div>
+</li>
+
+<li><a id="sec-5-1-2-4" name="sec-5-1-2-4"></a>Time<br  /><div class="outline-text-5" id="text-5-1-2-4">
+<p>
+Right now this is just a simple time display.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-conkyrc">^pa(1175)^fg(white)|\
+^bg()^fg(yellow)${time %a.%d.%m.%Y %R}
+</pre>
+</div>
+</div>
+</li></ol>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> applications</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+Use surfraw to look things up conveniently
+</p>
+<div class="org-src-container">
+
+<pre class="src src-ratpoison">bind h exec surfraw google    $(echo "" | dmenu)
+bind H exec surfraw wikipedia $(echo "" | dmenu)
+</pre>
+</div>
+
+<p>
+Use dmenu to run anything, and bind keys in the lower left-hand corner
+of the keyboard to open applications I use frequently
+</p>
+<div class="org-src-container">
+
+<pre class="src src-ratpoison">bind exclam exec
+bind at exec perl /home/ben/Dropbox/config/dmenu_run_weighted.pl
+bind m exec rxvt-unicode
+bind M exec gksudo synaptic
+bind comma exec firefox
+bind less exec uzbl-browser
+bind period exec emacsclient -c -a ""
+bind greater exec anki
+bind slash exec teeworlds
+bind question exec x-terminal-emulator -e nethack
+</pre>
+</div>
+
+<p>
+Dmenu interface for network manager
+</p>
+<div class="org-src-container">
+
+<pre class="src src-ratpoison">bind v exec /home/ben/Dropbox/config/nmcli-dmenu/nmcli_dmenu
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> Function keys</h2>
+<div class="outline-text-2" id="text-7">
+</div><div id="outline-container-sec-7-1" class="outline-3">
+<h3 id="sec-7-1"><span class="section-number-3">7.1</span> Volume</h3>
+<div class="outline-text-3" id="text-7-1">
+<div class="org-src-container">
+
+<pre class="src src-ratpoison"># force conky to reread init file so it updates
+definekey top XF86AudioLowerVolume exec amixer -D pulse set Master 5%- &amp;&amp; killall -SIGUSR1 conky
+definekey top XF86AudioRaiseVolume exec amixer -D pulse set Master 5%+ &amp;&amp; killall -SIGUSR1 conky
+definekey top XF86AudioMute exec amixer -D pulse set Master toggle &amp;&amp; killall -SIGUSR1 conky
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-7-2" class="outline-3">
+<h3 id="sec-7-2"><span class="section-number-3">7.2</span> Brightness</h3>
+<div class="outline-text-3" id="text-7-2">
+<p>
+I can't get XF86 brightness keys to work on my keyboard. But the
+bracket is in a more comfortable location anyway
+</p>
+<div class="org-src-container">
+
+<pre class="src src-ratpoison">bind bracketright exec xbacklight -inc 10
+bind bracketleft  exec xbacklight -dec 10
+bind braceright exec xbacklight -set 100
+bind braceleft  exec xbacklight -set 0
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-8" class="outline-2">
+<h2 id="sec-8"><span class="section-number-2">8</span> Workspaces</h2>
+<div class="outline-text-2" id="text-8">
+<p>
+rpws makes workspaces work. I haven't found myself using it much, though
+</p>
+
+<p>
+Make sure this is in ~/.xinitrc:
+</p>
+<pre class="example">
+exec /usr/bin/rpws init 12 -k
+</pre>
+
+<p>
+Use the function keys to switch workspaces:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-ratpoison">bind F1  exec rpws 1
+bind F2  exec rpws 2
+bind F3  exec rpws 3
+bind F4  exec rpws 4
+bind F5  exec rpws 5
+bind F6  exec rpws 6
+bind F7  exec rpws 7
+bind F8  exec rpws 8
+bind F9  exec rpws 9
+bind F10 exec rpws 10
+bind F11 exec rpws 11
+bind F12 exec rpws 12
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-9" class="outline-2">
+<h2 id="sec-9"><span class="section-number-2">9</span> Frames and windows</h2>
+<div class="outline-text-2" id="text-9">
+</div><div id="outline-container-sec-9-1" class="outline-3">
+<h3 id="sec-9-1"><span class="section-number-3">9.1</span> Frames</h3>
+<div class="outline-text-3" id="text-9-1">
+<div class="org-src-container">
+
+<pre class="src src-ratpoison">bind f fselect
+bind C-f fselect
+set framesels asdfjkl;qweruiopzxcvnm,./ghbty
+
+bind W split
+bind S exec ratpoison -c split; ratpoison -c focusdown;
+bind A hsplit
+bind D exec ratpoison -c hsplit; ratpoison -c focusright;
+
+bind Tab focus
+bind C-Tab focuslast
+bind C-A exchangeleft
+bind C-D exchangeright
+bind C-W exchangeup
+bind C-S exchangedown
+bind a focusleft
+bind d focusright
+bind w focusup
+bind s focusdown
+bind q only
+bind e remove
+bind C-a removeleft
+bind C-d removeright
+bind C-w removeup
+bind C-s removedown
+
+bind F curframe
+bind r resize
+bind R resize
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-9-2" class="outline-3">
+<h3 id="sec-9-2"><span class="section-number-3">9.2</span> Windows</h3>
+<div class="outline-text-3" id="text-9-2">
+<p>
+To switch between windows, I use a script adapted from <a href="https://github.com/dimatura/dratmenu/blob/master/dratmenu.py">dratmenu</a> I
+named rpdmenu. I just added an option to limit the window list to the
+application you're in when you run it. That plus iprev and inext makes
+it much easier to manage, e.g., a browser with many windows open.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ratpoison">bind            grave exec sudo pm-suspend
+bind asciitilde exec sudo pm-hibernate
+
+bind apostrophe exec python2 /home/ben/Dropbox/config/rpdmenu.py
+bind C-apostrophe exec python2 /home/ben/Dropbox/config/rpdmenu.py --same-app
+bind x prev
+bind X iprev
+bind c next
+bind C inext
+bind C-n next
+bind C-p prev
+bind space next
+bind C-space next
+
+bind C-x nextscreen
+bind C-c prevscreen
+
+bind z title
+bind minus select -
+bind k delete
+bind C-k delete
+bind K kill
+bind C-K kill
+
+bind t swap
+bind T swap
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-10" class="outline-2">
+<h2 id="sec-10"><span class="section-number-2">10</span> More keybindings</h2>
+<div class="outline-text-2" id="text-10">
+<div class="org-src-container">
+
+<pre class="src src-ratpoison">escape Alt_R
+bind b banish
+
+bind semicolon colon
+bind l redisplay
+bind C-l redisplay
+bind n lastmsg
+
+bind C-V license
+
+bind u undo
+bind U undo
+bind y redo
+bind Y redo
+## M-_ for every command so i don't need two keystrokes
+exec python3 /home/ben/Dropbox/config/ratpoison/tangle//metabindings.py
+</pre>
+</div>
+
+
+<p>
+Since L_Alt is the escape key, create an additional binding with the
+alt key for every command so we don't have to let go of R_Alt before
+pressing a key.
+</p>
+
+<p>
+This does mean that, for instance, <code>x</code> and <code>M-x</code> couldn't be bound to
+different commands.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #859900; font-weight: bold;">import</span> subprocess
+
+<span style="color: #268bd2;">rp_cmd</span> = [<span style="color: #2aa198;">"ratpoison"</span>, <span style="color: #2aa198;">"-c"</span>, <span style="color: #2aa198;">"help"</span> ]
+<span style="color: #268bd2;">rp</span> = subprocess.Popen(rp_cmd, stdout = subprocess.PIPE)
+<span style="color: #268bd2;">old_bindings</span> = rp.stdout.read().decode().split(<span style="color: #2aa198;">"\n"</span>)
+
+<span style="color: #268bd2;">additional_bindings</span> = []
+<span style="color: #859900; font-weight: bold;">for</span> b <span style="color: #859900; font-weight: bold;">in</span> old_bindings:
+    <span style="color: #859900; font-weight: bold;">if</span> <span style="color: #839496; font-weight: bold;">len</span>(b) == 0: <span style="color: #859900; font-weight: bold;">continue</span>
+    <span style="color: #268bd2;">binding</span>, <span style="color: #268bd2;">command</span> = b.split(<span style="color: #2aa198;">" "</span>, 1)
+    <span style="color: #859900; font-weight: bold;">if</span> binding.startswith(<span style="color: #2aa198;">"M-"</span>) <span style="color: #859900; font-weight: bold;">or</span> binding.startswith(<span style="color: #2aa198;">"C-M-"</span>): <span style="color: #859900; font-weight: bold;">continue</span>
+    <span style="color: #268bd2;">newbinding</span> = <span style="color: #2aa198;">"M-"</span> + binding <span style="color: #859900; font-weight: bold;">if</span> <span style="color: #859900; font-weight: bold;">not</span> binding.startswith(<span style="color: #2aa198;">"C-"</span>) <span style="color: #859900; font-weight: bold;">else</span> <span style="color: #2aa198;">"C-M-"</span> + binding[2:]
+    additional_bindings.append(newbinding + <span style="color: #2aa198;">" "</span> + command)
+
+<span style="color: #859900; font-weight: bold;">for</span> b <span style="color: #859900; font-weight: bold;">in</span> additional_bindings:
+    subprocess.call([<span style="color: #2aa198;">"ratpoison"</span>, <span style="color: #2aa198;">"-c"</span>, <span style="color: #2aa198;">"bind "</span> + b])
+</pre>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" name="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p class="footpara">
+Requires the following elisp snippet or equivalent in your
+init.el. <code>org-babel-post-tangle-hook</code> runs in a temporary buffer for
+every file that gets tangled to, so use an advice for the post-tangle
+case.
+</p>
+
+<pre class="example">
+(defun my-org-babel-pre-tangle ()
+  (when (member "_pre-tangle" (org-babel-src-block-names))
+    (save-excursion
+      (org-babel-goto-named-src-block "_pre-tangle")
+      (org-babel-execute-src-block))))
+
+(defun my-org-babel-post-tangle ()
+  (when (member "_post-tangle" (org-babel-src-block-names))
+    (save-excursion
+      (org-babel-goto-named-src-block "_post-tangle")
+      (org-babel-execute-src-block))))
+
+(add-hook 'org-babel-pre-tangle-hook  'my-org-babel-pre-tangle)
+
+;; org-babel-post-tangle-hook is run in every tangled buffer, so we
+;; need to use an advice
+(defadvice org-babel-tangle (after specialblock)
+  "Run a named src block to post-process / execute a named src
+block"
+  (print (current-buffer))
+  (my-org-babel-post-tangle))
+(ad-activate 'org-babel-tangle)
+</pre></div>
+
+
+</div>
+</div></div>
+<div id="postamble" class="status">
+<p class="author">Author: Ben Dean</p>
+<p class="date">Created: 2015-04-09 Thu 15:14</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.3.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
